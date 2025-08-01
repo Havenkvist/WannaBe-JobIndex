@@ -1,10 +1,12 @@
 import { PrismaClient } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
 export const resolvers = {
   Query: {
     jobs: () => prisma.job.findMany({ include: { user: true } }),
-    job: (_: any, { id }: { id: number }) => prisma.job.findUnique({ where: { id }, include: { user: true } }),
+    job: (_: any, { id }: { id: number }) =>
+      prisma.job.findUnique({ where: { id }, include: { user: true } }),
     companies: () => prisma.user.findMany({ where: { role: "COMPANY" } }),
   },
   Mutation: {

@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { JOBS_QUERY } from '../graphql/queries';
+import { JOBS_QUERY } from '../graphql/frontend/queries';
 
 export default function Home() {
   const { data, loading, error } = useQuery(JOBS_QUERY);

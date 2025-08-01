@@ -16,6 +16,7 @@ export const JOBS_QUERY = gql`
     }
   }
 `;
+
 export const JOB_QUERY = gql`
   query Job($id: Int!) {
     job(id: $id) {

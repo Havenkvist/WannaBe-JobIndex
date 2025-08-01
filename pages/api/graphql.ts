@@ -1,13 +1,18 @@
 import { ApolloServer } from 'apollo-server-micro';
-import { typeDefs } from '../../graphql/typeDefs';
-import { resolvers } from '../../graphql/resolvers';
+import { schema } from '../../graphql/backend/schema';
+import { resolvers } from '../../graphql/backend/resolvers';
 import { PrismaClient } from '@prisma/client';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 
 const prisma = new PrismaClient();
 
-const apolloServer = new ApolloServer({
-  typeDefs,
+const executableSchema = makeExecutableSchema({
+  typeDefs: schema,
   resolvers,
+});
+
+const apolloServer = new ApolloServer({
+  schema: executableSchema,
   context: () => ({ prisma }),
 });
 
