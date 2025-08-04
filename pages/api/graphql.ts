@@ -1,19 +1,30 @@
 import { ApolloServer } from 'apollo-server-micro';
-import { schema } from '../../graphql/backend/schema';
+import { typeDefs } from '../../graphql/backend/schema';
 import { resolvers } from '../../graphql/backend/resolvers';
 import { PrismaClient } from '@prisma/client';
-import { makeExecutableSchema } from '@graphql-tools/schema';
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
-
-const executableSchema = makeExecutableSchema({
-  typeDefs: schema,
-  resolvers,
-});
+const JWT_SECRET = process.env.JWT_SECRET!;
 
 const apolloServer = new ApolloServer({
-  schema: executableSchema,
-  context: () => ({ prisma }),
+  typeDefs,
+  resolvers,
+  context: ({ req }) => {
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: number; role: string };
+        return { prisma, userId: decoded.userId, userRole: decoded.role };
+      } catch {
+        // Invalid or expired token
+        return { prisma };
+      }
+    }
+    return { prisma };
+  },
 });
 
 export const config = {
@@ -22,10 +33,9 @@ export const config = {
   },
 };
 
-// You need to start the server before exporting the handler
 const startServer = apolloServer.start();
 
-export default async function handler(req, res) {
+export default async function handler(req: any, res: any) {
   await startServer;
   return apolloServer.createHandler({ path: '/api/graphql' })(req, res);
 }

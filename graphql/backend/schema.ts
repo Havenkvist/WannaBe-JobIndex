@@ -1,6 +1,6 @@
 import { gql } from 'apollo-server-micro';
 
-export const schema = gql`
+export const typeDefs = gql`
   enum Role {
     GRADUATE
     COMPANY
@@ -8,10 +8,11 @@ export const schema = gql`
 
   type User {
     id: Int!
-    name: String!
-    email: String!
-    role: Role!
-    jobs: [Job!]!
+    name: String
+    username: String!
+    email: String
+    role: Role
+    jobs: [Job!]
   }
 
   type Job {
@@ -21,6 +22,11 @@ export const schema = gql`
     company: String!
     location: String!
     postedAt: String!
+    user: User!
+  }
+
+  type AuthPayload {
+    token: String!
     user: User!
   }
 
@@ -38,5 +44,8 @@ export const schema = gql`
       location: String!
       userId: Int!
     ): Job!
+
+    login(username: String!, password: String!): AuthPayload!
+    register(username: String!, password: String!): AuthPayload!
   }
 `;
