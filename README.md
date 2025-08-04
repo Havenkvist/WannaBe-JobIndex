@@ -32,6 +32,7 @@ cd WannaBe-JobIndex
 Install dependencies
 
 npm install
+npx prisma generate
 
 or
 yarn
